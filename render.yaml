@@ -1,0 +1,48 @@
+services:
+  - type: web
+    name: earnmoney-bd-api
+    env: python
+    region: singapore
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn api.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: BOT_TOKEN
+        sync: false
+      - key: ADMIN_IDS
+        value: 633765043,6375918223
+      - key: DATABASE_URL
+        fromDatabase:
+          name: earnmoney-bd-db
+          property: connectionString
+      - key: SECRET_KEY
+        generateValue: true
+      - key: API_URL
+        value: https://earnmoney-bd-api.onrender.com
+      - key: WEBAPP_URL
+        value: https://earnmoney-bd-api.onrender.com/webapp
+
+  - type: worker
+    name: earnmoney-bd-bot
+    env: python
+    region: singapore
+    buildCommand: pip install -r requirements.txt
+    startCommand: python bot/main.py
+    envVars:
+      - key: BOT_TOKEN
+        sync: false
+      - key: ADMIN_IDS
+        value: 633765043,6375918223
+      - key: DATABASE_URL
+        fromDatabase:
+          name: earnmoney-bd-db
+          property: connectionString
+      - key: API_URL
+        value: https://earnmoney-bd-api.onrender.com
+      - key: WEBAPP_URL
+        value: https://earnmoney-bd-api.onrender.com/webapp
+
+databases:
+  - name: earnmoney-bd-db
+    databaseName: earnmoney_bd
+    user: earnmoney_user
+    region: singapore

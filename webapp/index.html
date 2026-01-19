@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EarnMoney BD</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding-bottom: 80px;
+        }
+
+        .container {
+            max-width: 480px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Glassmorphism Cards */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .glass-card:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 20px;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+
+        .header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        /* Balance Card */
+        .balance-card {
+            text-align: center;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.1));
+        }
+
+        .balance-amount {
+            font-size: 42px;
+            font-weight: bold;
+            color: #FFD700;
+            margin: 10px 0;
+        }
+
+        .balance-label {
+            color: white;
+            font-size: 16px;
+            opacity: 0.9;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .stat-item {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 15px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: white;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.8);
+            margin-top: 5px;
+        }
+
+        /* Section Title */
+        .section-title {
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        /* Feature Cards */
+        .feature-card {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            cursor: pointer;
+        }
+
+        .feature-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 15px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            margin-right: 15px;
+        }
+
+        .feature-content {
+            flex: 1;
+        }
+
+        .feature-title {
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 3px;
+        }
+
+        .feature-subtitle {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 13px;
+        }
+
+        .feature-arrow {
+            color: white;
+            font-size: 20px;
+        }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 10px 0;
+            display: flex;
+            justify-content: space-around;
+            z-index: 1000;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            padding: 5px 10px;
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .nav-item.active {
+            color: #FFD700;
+        }
+
+        .nav-icon {
+            font-size: 24px;
+        }
+
+        .nav-label {
+            font-size: 11px;
+        }
+
+        /* Pages (hidden by default) */
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        /* Button */
+        .btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 15px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
+            transition: transform 0.2s ease;
+        }
+
+        .btn:hover {
+            transform: scale(1.02);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Loading */
+        .loading {
+            text-align: center;
+            color: white;
+            padding: 40px 20px;
+        }
+
+        .spinner {
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-top: 3px solid white;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Hide scrollbar but keep functionality */
+        ::-webkit-scrollbar {
+            width: 0px;
+            background: transparent;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Home Page -->
+        <div id="home-page" class="page active">
+            <div class="header">
+                <h1>💰 EarnMoney BD</h1>
+                <p>আয় করুন সহজে</p>
+            </div>
+
+            <div class="balance-card glass-card">
+                <div class="balance-label">আপনার ব্যালেন্স</div>
+                <div class="balance-amount" id="balance">0৳</div>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-value" id="today-earnings">0৳</div>
+                    <div class="stat-label">আজকের আয়</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="total-earned">0৳</div>
+                    <div class="stat-label">মোট আয়</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="ads-watched">0/10</div>
+                    <div class="stat-label">আজকের বিজ্ঞাপন</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="referrals">0</div>
+                    <div class="stat-label">রেফারেল</div>
+                </div>
+            </div>
+
+            <div class="section-title">📊 দ্রুত অ্যাক্সেস</div>
+
+            <div class="glass-card feature-card" onclick="navigateTo('earn')">
+                <div class="feature-icon">🎁</div>
+                <div class="feature-content">
+                    <div class="feature-title">টাকা আয় করুন</div>
+                    <div class="feature-subtitle">বিজ্ঞাপন ও টাস্ক</div>
+                </div>
+                <div class="feature-arrow">›</div>
+            </div>
+
+            <div class="glass-card feature-card" onclick="navigateTo('withdraw')">
+                <div class="feature-icon">💸</div>
+                <div class="feature-content">
+                    <div class="feature-title">উইথড্র করুন</div>
+                    <div class="feature-subtitle">ন্যূনতম ১০০৳</div>
+                </div>
+                <div class="feature-arrow">›</div>
+            </div>
+        </div>
+
+        <!-- Earn Page -->
+        <div id="earn-page" class="page">
+            <div class="header">
+                <h1>🎁 আয় করুন</h1>
+            </div>
+
+            <div class="glass-card">
+                <div class="feature-title">📺 বিজ্ঞাপন দেখুন</div>
+                <div class="feature-subtitle">প্রতিটি বিজ্ঞাপনে ৫৳ আয়</div>
+                <button class="btn" id="watch-ad-btn" onclick="watchAd()">বিজ্ঞাপন দেখুন</button>
+                <div id="ad-cooldown" style="color: white; text-align: center; margin-top: 10px;"></div>
+            </div>
+
+            <div class="section-title">📋 টাস্ক সমূহ</div>
+            <div id="tasks-container">
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <p>লোড হচ্ছে...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Other pages would be similarly structured -->
+        <div id="referral-page" class="page">
+            <div class="header">
+                <h1>👥 রেফারেল</h1>
+            </div>
+            <div class="glass-card">
+                <div class="feature-title">আপনার রেফারেল লিংক</div>
+                <input type="text" id="referral-link" readonly style="width: 100%; padding: 10px; margin: 10px 0; border-radius: 10px; border: none;">
+                <button class="btn" onclick="copyReferralLink()">কপি করুন</button>
+            </div>
+        </div>
+
+        <div id="wallet-page" class="page">
+            <div class="header">
+                <h1>💰 ওয়ালেট</h1>
+            </div>
+            <div class="glass-card">
+                <p style="color: white;">Balance details here</p>
+            </div>
+        </div>
+
+        <div id="withdraw-page" class="page">
+            <div class="header">
+                <h1>💸 উইথড্র</h1>
+            </div>
+            <div class="glass-card">
+                <p style="color: white;">Withdrawal form here</p>
+            </div>
+        </div>
+
+        <div id="profile-page" class="page">
+            <div class="header">
+                <h1>👤 প্রোফাইল</h1>
+            </div>
+            <div class="glass-card">
+                <p style="color: white;">Profile information here</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <div class="bottom-nav">
+        <div class="nav-item active" onclick="navigateTo('home')">
+            <div class="nav-icon">🏠</div>
+            <div class="nav-label">হোম</div>
+        </div>
+        <div class="nav-item" onclick="navigateTo('earn')">
+            <div class="nav-icon">🎁</div>
+            <div class="nav-label">আয়</div>
+        </div>
+        <div class="nav-item" onclick="navigateTo('referral')">
+            <div class="nav-icon">👥</div>
+            <div class="nav-label">রেফারেল</div>
+        </div>
+        <div class="nav-item" onclick="navigateTo('wallet')">
+            <div class="nav-icon">💰</div>
+            <div class="nav-label">ওয়ালেট</div>
+        </div>
+        <div class="nav-item" onclick="navigateTo('withdraw')">
+            <div class="nav-icon">💸</div>
+            <div class="nav-label">উইথড্র</div>
+        </div>
+        <div class="nav-item" onclick="navigateTo('profile')">
+            <div class="nav-icon">👤</div>
+            <div class="nav-label">প্রোফাইল</div>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+</body>
+</html>

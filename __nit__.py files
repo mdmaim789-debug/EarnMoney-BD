@@ -1,0 +1,15 @@
+# Create these empty __init__.py files in each directory:
+# 
+# bot/__init__.py
+# bot/handlers/__init__.py
+# bot/keyboards/__init__.py
+# bot/middlewares/__init__.py
+# api/__init__.py
+# api/routes/__init__.py
+# database/__init__.py
+# config/__init__.py
+# utils/__init__.py
+#
+# All files should be empty or contain:
+
+"""Package initialization"""
